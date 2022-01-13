@@ -20,6 +20,14 @@ Available objects exposed to user:
 * `normal_queue` && `steal_queue` && `msg_queue` - all are template alias, and as container of task and message seperately.
 * `wrapper_thread` - a template alias, as its name, it's a wrapped class from std::thread for further control of child threads.
 * `tuple` && `function` && `variant` - tool objects, they are specialized from STL to weaken compatibility and enhance special purposes.
-* `default_pool` && `ctr_pool` - all are template alias, The former is an ordinary thread pool, and the latter has more powerful control over sub-threads, but the efficiency will be reduced
+* `default_pool` && `ctr_pool` - all are template alias, The former is an ordinary thread pool, and the latter has more powerful control over sub-threads, but the efficiency will be reduced.
 
+Available core API exposed to user:
+
+* `wait()` - from `receiver`, starting interface for processing message.
+* `send(_M& )`  - from `sender`, message passing interface.
+* `push(T )` - from `normal_queue` and `steal_queue`. In general, normal_queue is faster because it has a lower granularity than steal_queue is  designed to exchange space for time.
+* `pull()` && `pull(T& )` - from `normal_queue`. it's blocked on condition_variable.
+* `try_pull(T& )` - from `normal_queue` and `steal_queue`. it's not blocked, except blocking on mutex.
+* 
 
