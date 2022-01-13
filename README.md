@@ -38,10 +38,18 @@ Available core API exposed to user:
 * `sumit(F&& )` - from `default_pool` and `ctr_pool`.
 
 # Using the library
-The lib provided are header-only class templates, no building/installing is necessary.
+The lib provides header-only class templates, no building/installing is necessary.
 
 ## Install from GitHub
 1. Clone the project:
 ```
-
+https://github.com/Wyther-Yang/conts.git
 ```
+2. Add `conts/include` directory (use full path) to the include paths of your build system.
+
+### Contributing
+The project uses Mozilla's `clang-format` to automate formatting. Pull requests are expected to be formatted using these settings.
+
+---
+
+Copyright (c) 2022  MIT License. See the full licence in file LICENSE.
