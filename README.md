@@ -4,6 +4,8 @@
 ![Latest release](https://img.shields.io/github/v/tag/max0x7ba/atomic_queue?label=latest%20release)
 ![Ubuntu continuous integration](https://github.com/max0x7ba/atomic_queue/workflows/Ubuntu%20continuous%20integration/badge.svg)
 
+---
+
 # conts
 
 ConTS is a concurrent library, which covers message processing, message passing, task management, efficient and robust thread pool. combined with many characteristics of modern C + +, it focuses on efficiency and ease of use, and has been developed, tested and benchmarked on Linux.
