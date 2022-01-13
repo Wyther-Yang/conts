@@ -17,24 +17,39 @@ It's also limitation:
 Available objects exposed to user:
 
 * `sender` && `receiver` - a handler of message passing.
+
 * `normal_queue` && `steal_queue` && `msg_queue` - all are template alias, and as container of task and message seperately.
+
 * `wrapper_thread` - a template alias, as its name, it's a wrapped class from std::thread for further control of child threads.
+
 * `tuple` && `function` && `variant` - tool objects, they are specialized from STL to weaken compatibility and enhance special purposes.
+
 * `default_pool` && `ctr_pool` - all are template alias, The former is an ordinary thread pool, and the latter has more powerful control over sub-threads, but the efficiency will be reduced.
 
 Available core API exposed to user:
 
 * `wait()` - from `receiver`, starting interface for processing message.
+
 * `send(_M& )`  - from `sender`, message passing interface.
+
 * `push(T )` - from `normal_queue` and `steal_queue`. In general, normal_queue is faster because it has a lower granularity than steal_queue is  designed to exchange space for time.
+
 * `pull()` && `pull(T& )` - from `normal_queue`. it's blocked on condition_variable.
+
 * `try_pull(T& )` - from `normal_queue` and `steal_queue`. it's not blocked, except blocking on mutex.
+
 * `interrupt_point()`. it gives the feature of interruption for improving responsiveness with concurrency.
+
 * `interrupt_wait(...)`, a variable parameter template interface. like `interrupt_point()`, but it targets the blocking process on std::condition_variable or std::future;
+
 * `interrupt()` - from `wrapper_thread`, it active interrupt sub-thread.
+
 * `apply(F&& , Tp&&)` , it applys some kind of operation to each element of `tuple`.
+
 * `apply(F&& )` - from `variant`, it applys an operation to an element.
+
 * `try_executing_one()` - from `default_pool` and `ctr_pool`, it gives the ability of other threads to perform tasks in the thread pool.
+
 * `sumit(F&& )` - from `default_pool` and `ctr_pool`.
 
 # Using the library
