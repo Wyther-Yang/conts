@@ -6,6 +6,16 @@
 
 # conts
 
-conTS is a concurrent library, which covers message processing, message passing, task management, efficient and robust thread pool. combined with many characteristics of modern C + +, it focuses on efficiency and ease of use.
+ConTS is a concurrent library, which covers message processing, message passing, task management, efficient and robust thread pool. 
+
+combined with many characteristics of modern C + +, it focuses on efficiency and ease of use, and has been developed, tested and 
+
+benchmarked on Linux.
+
+It's also limitation:
+
+* At least with gcc10, because partial features need template argument deduction in C++ 17.
+
+# con
 
 
