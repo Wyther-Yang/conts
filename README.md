@@ -29,5 +29,19 @@ Available core API exposed to user:
 * `push(T )` - from `normal_queue` and `steal_queue`. In general, normal_queue is faster because it has a lower granularity than steal_queue is  designed to exchange space for time.
 * `pull()` && `pull(T& )` - from `normal_queue`. it's blocked on condition_variable.
 * `try_pull(T& )` - from `normal_queue` and `steal_queue`. it's not blocked, except blocking on mutex.
-* 
+* `interrupt_point()`. it gives the feature of interruption for improving responsiveness with concurrency.
+* `interrupt_wait(...)`, a variable parameter template interface. like `interrupt_point()`, but it targets the blocking process on std::condition_variable or std::future;
+* `interrupt()` - from `wrapper_thread`, it active interrupt sub-thread.
+* `apply(F&& , Tp&&)` , it applys some kind of operation to each element of `tuple`.
+* `apply(F&& )` - from `variant`, it applys an operation to an element.
+* `try_executing_one()` - from `default_pool` and `ctr_pool`, it gives the ability of other threads to perform tasks in the thread pool.
+* `sumit(F&& )` - from `default_pool` and `ctr_pool`.
 
+# Using the library
+The lib provided are header-only class templates, no building/installing is necessary.
+
+## Install from GitHub
+1. Clone the project:
+```
+
+```
