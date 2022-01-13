@@ -14,6 +14,12 @@ It's also limitation:
 
 * At least with gcc10, because partial features need template argument deduction in C++ 17.
 
-# con
+Available objects exposed to user:
+
+* `sender` && `receiver` - a handler of message passing.
+* `normal_queue` && `steal_queue` && `msg_queue` - all are template alias, and as container of task and message seperately.
+* `wrapper_thread` - a template alias, as its name, it's a wrapped class from std::thread for further control of child threads.
+* `tuple` && `function` && `variant` - tool objects, they are specialized from STL to weaken compatibility and enhance special purposes.
+* `default_pool` && `ctr_pool` - all are template alias, The former is an ordinary thread pool, and the latter has more powerful control over sub-threads, but the efficiency will be reduced
 
 
