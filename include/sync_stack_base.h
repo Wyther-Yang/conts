@@ -2,7 +2,6 @@
 #define GUID_FACE677D_151A_4BD8_A5C5_A90C78A67B0D_YANG
 
 #include "pre_config.h"
-#include <iostream>
 
 namespace concurrent {
 namespace stack {
@@ -21,11 +20,6 @@ struct _sync_ll_stack_base
   {
     shared_ptr<_T> _M_data;
     node* _M_next;
-
-    ~node()
-    {
-      std::cout << "done! ";
-    }
   };
 
   __ALIGNAS_WITH_GCC
