@@ -2,7 +2,7 @@
 [![MIT license](https://img.shields.io/github/license/max0x7ba/atomic_queue)](https://github.com/max0x7ba/atomic_queue/blob/master/LICENSE)
 ![platform Linux 64-bit](https://img.shields.io/badge/platform-Linux%2064--bit-yellow)
 ![Latest release](https://img.shields.io/github/v/tag/max0x7ba/atomic_queue?label=latest%20release)
-![Ubuntu continuous integration](https://github.com/max0x7ba/atomic_queue/workflows/Ubuntu%20continuous%20integration/badge.svg)
+![Ubuntu](https://github.com/max0x7ba/atomic_queue/workflows/Ubuntu%20continuous%20integration/badge.svg)
 
 ---
 
@@ -40,7 +40,7 @@ Available core API exposed to user:
 
 * `interrupt_point()`. it gives the feature of interruption for improving responsiveness with concurrency.
 
-* `interrupt_wait(...)`, a variable parameter template interface. like `interrupt_point()`, but it targets the blocking process on std::condition_variable or std::future;
+* `interrupt_wait(...)`, a variadic parameter template interface. like `interrupt_point()`, but it targets the blocking process on std::condition_variable or std::future;
 
 * `interrupt()` - from `wrapper_thread`, it active interrupt sub-thread.
 
@@ -62,8 +62,16 @@ https://github.com/Wyther-Yang/conts.git
 ```
 2. Add `conts/include` directory (use full path) to the include paths of your build system.
 
+3. `#include <conts.h>` in your c++ source.
+
+## Implementation Notes
+Almost all API in the lib appear as the style of passe by value , so Rvalue ref constructor and assign must be provided if want to be efficient. Template argument deduction from constructor and variadic parameter template is needed for easy to use and simple to interface.
+
+## Benchmarks
+`bm_test(F , unsigned)` from `benchmark.h` is used as benchmark interface, with algorithms from `con_algo.h` test the correctness and efficiency of the components. 
+
 ### Contributing
-The project uses Mozilla's `clang-format` to automate formatting. Pull requests are expected to be formatted using these settings.
+The project uses Mozilla's `clang-format` to automate formatting. Pull requests are expected to be formatted using the same settings.
 
 ---
 
