@@ -20,6 +20,8 @@ Available objects exposed to user:
 
 * `normal_queue` && `steal_queue` && `msg_queue` - all are template alias, and as container of task and message seperately.
 
+* `ll_stack` && `hl_stack` - all are template alias, designed for low(ll) and high(hl) load requirement.
+
 * `wrapper_thread` - a template alias, as its name, it's a wrapped class from std::thread for further control of child threads.
 
 * `tuple` && `function` && `variant` - tool objects, they are specialized from STL to weaken compatibility and enhance special purposes.
