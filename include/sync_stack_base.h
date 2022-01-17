@@ -13,6 +13,7 @@ enum class stack_type
   high_load
 };
 
+// for low load
 template<typename _T>
 struct _sync_ll_stack_base
 {
@@ -113,6 +114,116 @@ struct _sync_ll_stack_base
       pending_node(__n);
       sub_with_rlx(1);
     }
+  }
+};
+
+// for high load
+template<typename _T>
+struct _sync_hl_stack_base
+{
+
+  struct _cptr;
+
+  struct node
+  {
+    shared_ptr<_T> _M_data;
+    _cptr _M_next;
+    //__ALIGNAS_WITH_GCC
+    std::atomic<int> _M_count;
+
+    __DEFAULT_CTOR(node);
+
+    node(_T __val, _cptr __next)
+      : _M_data(make_shared<_T>(move(__val)))
+      , _M_next(__next)
+      , _M_count(0)
+    {}
+  };
+
+  struct _cptr
+  {
+    int _M_count;
+    node* _M_ptr;
+  };
+
+  std::atomic<_cptr> _M_head;
+
+  inline auto compare_ex_with_acq_rlx(std::atomic<_cptr>& __A,
+                                      _cptr& __source,
+                                      _cptr& __candidate)
+  {
+    return __A.compare_exchange_weak(__source,
+                                     __candidate,
+                                     std::memory_order_acquire,
+                                     std::memory_order_relaxed);
+  }
+
+  inline auto compare_ex_with_rel_rlx(std::atomic<_cptr>& __A,
+                                      _cptr& __source,
+                                      _cptr& __candidate)
+  {
+    return __A.compare_exchange_weak(__source,
+                                     __candidate,
+                                     std::memory_order_release,
+                                     std::memory_order_relaxed);
+  }
+
+  inline auto compare_ex_strong_with_rlx(std::atomic<_cptr>& __A,
+                                         _cptr& __source,
+                                         _cptr& __candidate)
+  {
+    return __A.compare_exchange_strong(
+      __source, __candidate, std::memory_order_relaxed);
+  }
+
+  inline auto compare_ex_strong_with_acq_rlx(std::atomic<_cptr>& __A,
+                                             _cptr& __source,
+                                             _cptr& __candidate)
+  {
+    return __A.compare_exchange_strong(__source,
+                                       __candidate,
+                                       std::memory_order_acquire,
+                                       std::memory_order_relaxed);
+  }
+
+  inline void as_fence(std::atomic<int>& __A)
+  {
+    __A.load(std::memory_order_acquire);
+  }
+
+  inline auto load_with_rlx(std::atomic<_cptr>& __A)
+  {
+    return __A.load(std::memory_order_relaxed);
+  }
+
+  inline auto add_with_rlx(std::atomic<int>& __A, int __n)
+  {
+    return __A.fetch_add(__n, std::memory_order_relaxed);
+  }
+
+  inline auto add_with_rel(std::atomic<int>& __A, int __n)
+  {
+    return __A.fetch_add(__n, std::memory_order_release);
+  }
+
+  inline auto sub_with_rlx(std::atomic<int>& __A, int __n)
+  {
+    return __A.fetch_sub(__n, std::memory_order_relaxed);
+  }
+
+  inline auto sub_with_rel(std::atomic<int>& __A, int __n)
+  {
+    return __A.fetch_sub(__n, std::memory_order_release);
+  }
+
+  inline void update_head_count(_cptr& __old)
+  {
+    _cptr temp;
+    do {
+      temp = __old;
+      ++temp._M_count;
+    } while (!compare_ex_strong_with_acq_rlx(_M_head, __old, temp));
+    ++__old._M_count;
   }
 };
 

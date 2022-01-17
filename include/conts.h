@@ -9,6 +9,7 @@
 #include "receiver.h"
 #include "sender.h"
 #include "sync_queue.h"
+#include "sync_stack.h"
 #include "thread_pool.h"
 
 namespace conts {
