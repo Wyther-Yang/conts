@@ -151,7 +151,7 @@ public:
 };
 
 // local thread handler used by main or distributing thread
-thread_local interrupt_flag current_thread_interrupt_flag;
+inline thread_local interrupt_flag current_thread_interrupt_flag;
 
 //
 void
