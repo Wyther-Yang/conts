@@ -84,8 +84,8 @@ class base_thread_pool<_Q, wrapper_thread<_Callable>>
   using __queues_t = vector<std::unique_ptr<_Q>>;
   using __queue_t = normal_queue<base_work_t>;
 
-  static thread_local int _M_idx;
-  static thread_local __main_queue_t* _M_local_q_ptr;
+  inline static thread_local int _M_idx{};
+  inline static thread_local __main_queue_t* _M_local_q_ptr{};
   __threads_t _M_ths;
   __queues_t _M_qs;
   __queue_t _M_q;
@@ -169,13 +169,6 @@ public:
     }
   }
 };
-
-template<typename _Q, typename _Callable>
-thread_local int base_thread_pool<_Q, wrapper_thread<_Callable>>::_M_idx{};
-
-template<typename _Q, typename _Callable>
-thread_local _Q*
-  base_thread_pool<_Q, wrapper_thread<_Callable>>::_M_local_q_ptr{};
 
 } // namespace pool
 } // namespace concurrent
