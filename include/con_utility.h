@@ -12,6 +12,10 @@
  *
  * @con-variant, variant of STL is tedious and not practical because of the two
  * aspect that too much space is used and too many restrictions.
+ *
+ * @con-any, remove some error prone-interfaces, only one construction
+ * applied(eg. any a(std::string("hello"))), suggest that using variant rather
+ * than any.
  */
 
 #ifndef GUID_F9DE9EF9_7A27_4845_B247_99F40AC0DCCF_YANG
@@ -644,8 +648,165 @@ public:
 
 //////////////////// con-union finished.
 
+/////// con-any
+
+class any
+{
+  template<typename _Tp>
+  struct _any_manager_internal;
+
+  template<typename _Tp>
+  struct _any_manager_external;
+
+  enum class _any_op
+  {
+    _access = 0,
+    _get_type_info,
+    _destory,
+    //  _exchange
+  };
+
+  union _storage
+  {
+    void* _M_ptr;
+    __gnu_cxx::__aligned_membuf<void*> _M_buffer;
+  };
+
+  union _args
+  {
+    void* obj;
+    std::type_info const* type_info;
+    any* a;
+  };
+
+  template<typename _Tp>
+  using _choice =
+    std::integral_constant<bool, (sizeof(_Tp) <= sizeof(_storage))>;
+
+  template<typename _Tp>
+  using _manager = std::conditional_t<_choice<_Tp>::value,
+                                      _any_manager_internal<_Tp>,
+                                      _any_manager_external<_Tp>>;
+  //
+  _storage _M_s;
+  void (*_M_m)(_any_op, any const*, _args*){};
+
+  template<typename _Tp>
+  struct _any_manager_internal
+  {
+    static void _S_manage(_any_op __which, any const* __any, _args* __arg)
+    {
+      _Tp const* ptr = static_cast<_Tp const*>(__any->_M_s._M_buffer._M_addr());
+      //_Tp const* ptr = reinterpret_cast<_Tp
+      // const*>(__any->_M_s._M_buffer._M_storage);
+      switch (__which) {
+        case _any_op::_access:
+          __arg->obj = const_cast<_Tp*>(ptr);
+          break;
+        case _any_op::_get_type_info:
+          __arg->type_info = &typeid(_Tp);
+          break;
+        case _any_op::_destory:
+          ptr->~_Tp();
+          break;
+      }
+    }
+
+    static void _S_create(_storage& __s, _Tp&& value)
+    {
+      ::new (__s._M_buffer._M_addr()) _Tp(std::forward<_Tp>(value));
+    }
+
+    static constexpr _Tp* _S_access(_storage& __s)
+    {
+      return static_cast<_Tp*>(__s._M_buffer._M_addr());
+    }
+  };
+
+  template<typename _Tp>
+  struct _any_manager_external
+  {
+
+    static void _S_manage(_any_op __which, any const* __any, _args* __arg)
+    {
+      _Tp const* ptr = static_cast<_Tp const*>(__any->_M_s._M_ptr);
+      switch (__which) {
+        case _any_op::_access:
+          __arg->obj = const_cast<_Tp*>(ptr);
+          break;
+        case _any_op::_get_type_info:
+          __arg->type_info = &typeid(_Tp);
+          break;
+        case _any_op::_destory:
+          delete ptr;
+          break;
+      }
+    }
+
+    static void _S_create(_storage& __s, _Tp&& value)
+    {
+      __s._M_ptr = new _Tp(std::forward<_Tp>(value));
+    }
+
+    static constexpr _Tp* _S_access(_storage& __s)
+    {
+      return static_cast<_Tp*>(__s._M_ptr);
+    }
+  };
+
+  //
+  template<typename _Tp>
+  friend _Tp* get(any*);
+
+public:
+  any() = default;
+  any(any&) = delete;
+  any(any&&) = delete;
+  any& operator=(any&) = delete;
+  any& operator=(any&&) = delete;
+  ~any() { reset(); }
+
+  template<typename _Tp, typename _M = _manager<std::decay_t<_Tp>>>
+  explicit any(_Tp&& __val) noexcept
+    : _M_m(_M::_S_manage)
+  {
+    _M::_S_create(_M_s, std::forward<_Tp>(__val));
+  }
+
+  inline bool has_value() const noexcept { return _M_m; }
+
+  std::type_info const& type() const noexcept
+  {
+    if (!has_value())
+      return typeid(void);
+    _args __arg;
+    _M_m(_any_op::_get_type_info, this, &__arg);
+    return *__arg.type_info;
+  }
+
+  void reset()
+  {
+    if (has_value()) {
+      _M_m(_any_op::_destory, this, nullptr);
+      _M_m = nullptr;
+    }
+  }
+};
+
+//
+template<typename _Tp>
+_Tp*
+get(any* __any)
+{
+  using _Up = std::remove_cv_t<_Tp>;
+  if (__any->type() == typeid(_Up))
+    return any::_manager<_Up>::_S_access(__any->_M_s);
+  return nullptr; // may should throw a exception for mismatch
+}
+
 } // namespace utility
 
+using utility::any;
 using utility::tuple;
 using utility::variant;
 

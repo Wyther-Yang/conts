@@ -15,6 +15,7 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+#include <typeinfo>
 
 #ifdef __NEED_OUTSTREAM
 #include <ostream>
