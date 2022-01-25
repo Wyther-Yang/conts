@@ -24,7 +24,7 @@ Available objects exposed to user:
 
 * `wrapper_thread` - a template alias, as its name, it's a wrapped class from std::thread for further control of child threads.
 
-* `tuple` && `function` && `variant` - tool objects, they are specialized from STL to weaken compatibility and enhance special purposes.
+* `tuple` && `function` && `variant` && any - tool objects, they are specialized from STL to weaken compatibility and enhance special purposes.
 
 * `default_pool` && `ctr_pool` - all are template alias, The former is an ordinary thread pool, and the latter has more powerful control over sub-threads, but the efficiency will be reduced.
 
