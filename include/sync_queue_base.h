@@ -10,6 +10,106 @@ namespace queue {
 template<typename T, queue_type types>
 class sync_queue_base;
 
+// high-load
+template<typename _T>
+struct _sync_hl_queue_base
+{
+
+  static constexpr auto ac = std::memory_order::acquire;
+  static constexpr auto re = std::memory_order::release;
+  static constexpr auto rx = std::memory_order::relaxed;
+
+  struct node;
+
+  struct counted_ptr
+  {
+    // node ptr
+    node* n_ptr;
+    // single count
+    int s_count;
+  };
+
+  struct counter
+  {
+    unsigned internal_count : 30 {};
+    unsigned external_count : 2 { 2 };
+  };
+
+  struct node
+  {
+    atomic<_T*> data;
+    atomic<counter> all_count;
+    atomic<counted_ptr> next;
+  };
+
+  atomic<counted_ptr> head;
+  atomic<counted_ptr> tail;
+
+  _sync_hl_queue_base()
+  {
+    node* temp = new node{};
+    head.store({ temp, 0 });
+    tail.store({ temp, 0 });
+  }
+  _sync_hl_queue_base(_sync_hl_queue_base&) = delete;
+  _sync_hl_queue_base(_sync_hl_queue_base&&) = delete;
+  _sync_hl_queue_base& operator=(_sync_hl_queue_base&) = delete;
+  _sync_hl_queue_base& operator=(_sync_hl_queue_base&&) = delete;
+  ~_sync_hl_queue_base() = default;
+
+  inline void increase_count(atomic<counted_ptr>& __A, counted_ptr& __old)
+  {
+    counted_ptr __new;
+    do {
+      __new = __old;
+      ++__new.s_count;
+    } while (!__A.compare_exchange_strong(__old, __new, rx));
+    __old = __new;
+  }
+
+  void normal_release_ref(node* __n_ptr)
+  {
+    counter __curr = __n_ptr->all_count.load(rx);
+    counter __new;
+    do {
+      __new = __curr;
+      --__new.internal_count;
+    } while (!__n_ptr->all_count.compare_exchange_strong(__curr, __new, rx));
+    if (!__new.internal_count && !__new.external_count) {
+      delete __n_ptr;
+    }
+  }
+
+  void ends_release_ref(counted_ptr& __old)
+  {
+    node* const __n_ptr = __old.n_ptr;
+    int const num = __old.s_count - 1;
+    counter __curr = __n_ptr->all_count.load(rx);
+    counter __new;
+    do {
+      __new = __curr;
+      __new.internal_count += num;
+      --__new.external_count;
+    } while (__n_ptr->all_count.compare_exchange_strong(__curr, __new, rx));
+    if (!__new.internal_count && !__new.external_count) {
+      delete __n_ptr;
+    }
+  }
+
+  void set_new_tail(counted_ptr& __old, counted_ptr const& __new)
+  {
+    node* const __n_ptr = __old.n_ptr;
+    while (!tail.compare_exchange_strong(__old, __new, rx) &&
+           __n_ptr == __old.n_ptr)
+      ;
+    if (__n_ptr == __old.n_ptr) {
+      ends_release_ref(__old);
+    } else {
+      normal_release_ref(__n_ptr);
+    }
+  }
+};
+
 // normal
 template<typename T>
 class sync_queue_base<T, normal>

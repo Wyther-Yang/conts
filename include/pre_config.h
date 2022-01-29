@@ -64,6 +64,7 @@
 #define __THROW_EXCEPTION(x) throw(x)
 
 using std::atomic_bool;
+using std::atomic;
 using std::condition_variable;
 using std::deque;
 using std::future;

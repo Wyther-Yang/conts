@@ -9,6 +9,85 @@ namespace queue {
 template<typename T, queue_type types>
 class sync_queue;
 
+// high-load queue
+template<typename _T>
+class hl_queue : _sync_hl_queue_base<_T>
+{
+  using super = _sync_hl_queue_base<_T>;
+  using node = super::node;
+  using counted_ptr = super::counted_ptr;
+  using counter = super::counter;
+
+public:
+  void push(_T val)
+  {
+    unique_ptr<_T> data_guard(new _T(std::move(val)));
+    counted_ptr new_node{};
+    new_node.n_ptr = new node{};
+    counted_ptr __old = super::tail.load(super::rx);
+    for (;;) {
+      super::increase_count(super::tail, __old);
+      _T* curr_data{};
+      if (__old.n_ptr->data.compare_exchange_strong(
+            curr_data, data_guard.get(), super::re, super::rx)) {
+        counted_ptr temp{};
+        if (!__old.n_ptr->next.compare_exchange_strong(
+              temp, new_node, super::re, super::rx)) {
+          delete new_node.n_ptr;
+          new_node = temp;
+        }
+        super::set_new_tail(__old, new_node);
+        data_guard.release();
+        break;
+      } else {
+        counted_ptr temp{};
+        if (__old.n_ptr->next.compare_exchange_strong(
+              temp, new_node, super::rx)) {
+          temp = new_node;
+          new_node.n_ptr = new node{};
+        }
+        super::set_new_tail(__old, temp);
+      }
+    }
+  }
+
+  unique_ptr<_T> pull()
+  {
+    counted_ptr __old = super::head.load(super::rx);
+    for (;;) {
+      super::increase_count(super::head, __old);
+      node* const curr_ptr = __old.n_ptr;
+      if (curr_ptr == super::tail.load(super::rx).n_ptr) {
+        super::normal_release_ref(curr_ptr);
+        return unique_ptr<_T>{};
+      }
+      counted_ptr new_next = curr_ptr->next.load(super::rx);
+      if (super::head.compare_exchange_strong(__old, new_next, super::rx)) {
+        _T* const res = curr_ptr->data.exchange(nullptr, super::ac);
+        super::ends_release_ref(__old);
+        return unique_ptr<_T>(res);
+      }
+      super::normal_release_ref(curr_ptr);
+    }
+  }
+
+  bool is_empty() const noexcept
+  {
+    return super::head.load(super::rx).n_ptr ==
+           super::tail.load(super::rx).n_ptr;
+  }
+
+  ~hl_queue()
+  {
+    for (;;) {
+      if (!pull()) {
+        delete super::head.load(super::rx).n_ptr;
+        break;
+      }
+    }
+  }
+};
+
 // a normal queue used at thread pool
 template<typename T>
 class sync_queue<T, normal> : public sync_queue_base<T, normal>
@@ -156,6 +235,8 @@ using normal_queue = queue::sync_queue<T, queue::normal>;
 
 template<typename T>
 using steal_queue = queue::sync_queue<T, queue::steal>;
+
+using queue::hl_queue;
 
 } // namespace concurrent
 
