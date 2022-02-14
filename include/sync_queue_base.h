@@ -124,8 +124,8 @@ protected:
   unique_ptr<node> head;
   node* tail;
   condition_variable condi;
-  mutex head_mutex;
-  mutex tail_mutex;
+  mutable mutex head_mutex;
+  mutable mutex tail_mutex;
   atomic_bool closed_;
 
 public:
@@ -210,7 +210,7 @@ template<typename T>
 class sync_queue_base<T, steal>
 {
 protected:
-  mutex _mutex;
+  mutable mutex _mutex;
   deque<T> _data;
 
   typedef deque<T> container_type;
