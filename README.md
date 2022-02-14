@@ -8,7 +8,7 @@
 
 # conts
 
-ConTS is a concurrent library, which covers message processing, message passing, task management, efficient and robust thread pool. combined with many characteristics of modern C + +, it focuses on efficiency and ease of use, and has been developed, tested and benchmarked on Linux.
+ConTS is a concurrent library, which covers message processing, task management, efficient and robust thread pool. combined with many characteristics of modern C + +, it focuses on efficiency and ease of use, and has been developed, tested and benchmarked on Linux.
 
 It's also limitation:
 
@@ -19,6 +19,8 @@ Available objects exposed to user:
 * `sender` && `receiver` - a handler of message passing.
 
 * `normal_queue` && `steal_queue` && `msg_queue` - all are template alias, and as container of task and message seperately.
+
+* `hl_queue` - a template class, is suitable as the main interaction queue in high-load scenarios. depending on the specific situation maybe need adjust slightly. 
 
 * `ll_stack` && `hl_stack` - all are template alias, designed for low(ll) and high(hl) load requirement.
 
