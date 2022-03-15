@@ -12,7 +12,7 @@ enum class queue_op_status
   success,
   busy,
   closed,
-  timeout,
+ // timeout,
   get_fail
 };
 
