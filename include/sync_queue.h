@@ -59,7 +59,7 @@ public:
       node* const curr_ptr = __old.n_ptr;
       if (curr_ptr == super::tail.load(super::rx).n_ptr) {
         super::normal_release_ref(curr_ptr);
-        return unique_ptr<_T>{};
+        return {};
       }
       counted_ptr new_next = curr_ptr->next.load(super::rx);
       if (super::head.compare_exchange_strong(__old, new_next, super::rx)) {
