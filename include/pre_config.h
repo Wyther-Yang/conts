@@ -57,9 +57,6 @@
   __ACCEPT_RVALUE_ASSIGN(TYPE)                                                 \
   __ACCEPT_RVALUE_CTOR(TYPE)
 
-#if defined __USE_BOOST_THREAD
-#define BOOST_THREAD_VERSION 5
-#endif
 
 #define __THROW_EXCEPTION(x) throw(x)
 
