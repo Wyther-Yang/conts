@@ -20,6 +20,6 @@ public:
 
 using msg::receiver;
 
-} // namespace concurrent
+} 
 
 #endif /* GUID_C3540073_7322_4CB9_A0EE_00AD354625C7_YANG */
