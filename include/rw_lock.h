@@ -3,6 +3,8 @@
 
 #include <atomic>
 
+using std::atomic;
+
 namespace conts {
 
 // with 80x86 arch, opt in spin loop
@@ -10,6 +12,8 @@ inline void cpu_relax() { __asm__ __volatile__("rep;nop" : : : "memory"); }
 
 #define R_FREE  0x01000000U
 #define W_FREE  0x00000000U
+
+#define NUM 0x00111111U
 
 #define onps 0x10000000U
 
@@ -42,7 +46,7 @@ inline int rw_sp_lock::r_lock()
     if (old & R_FREE) {
       if (cnt.compare_exchange_strong(old, old + 1, std::memory_order_acquire,
                                       std::memory_order_relaxed))
-        return old + 1;
+        return (old + 1) & NUM;
     }
     cpu_relax();
   }
