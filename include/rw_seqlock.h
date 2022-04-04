@@ -9,12 +9,19 @@ namespace conts {
 
 class seq_sp_lock 
 {
-
   atomic<bool> sp_lock{};
 
   atomic<uint64_t> seq_cnt{};
 
 public:
+  seq_sp_lock() = default;
+  seq_sp_lock(seq_sp_lock&) = delete;
+  seq_sp_lock(seq_sp_lock&&) = delete;
+  seq_sp_lock& operator=(seq_sp_lock&) = delete;
+  seq_sp_lock& operator=(seq_sp_lock&&) = delete;
+  ~seq_sp_lock() = default;
+
+
   inline void w_seqlock();
 
   inline void w_sequnlock();
