@@ -8,7 +8,7 @@ using std::atomic;
 namespace conts {
 
 // with 80x86 arch, opt in spin loop
-inline void cpu_relax() { __asm__ __volatile__("rep;nop" : : : "memory"); }
+// inline void cpu_relax() { __asm__ __volatile__("rep;nop" : : : "memory"); }
 
 #define R_FREE  0x01000000U
 #define W_FREE  0x00000000U
@@ -48,7 +48,7 @@ inline int rw_sp_lock::r_lock()
                                       std::memory_order_relaxed))
         return (old + 1) & NUM;
     }
-    cpu_relax();
+    // cpu_relax();
   }
   return onps;
 }
@@ -59,7 +59,7 @@ inline void rw_sp_lock::w_lock()
   while (!cnt.compare_exchange_strong(tmp, W_FREE, std::memory_order_acquire,
                                      std::memory_order_relaxed))
   {
-    cpu_relax();
+   // cpu_relax();
     tmp = R_FREE;
   }
 }
