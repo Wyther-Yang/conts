@@ -66,7 +66,10 @@ public:
 template<typename _T>
 class rcu_t
 {
+  // the mutex should be classified to spinlock as the same as the kernel, but
+  // in the app layer, the block lock may be better.
   mutex m{};
+  
   r_transfer<_T> src{};
 
 public:
@@ -76,7 +79,7 @@ public:
   rcu_t& operator=(rcu_t&&) = delete;
   ~rcu_t() = default;
 
-  // forbid cpy the reture value to other thread, only moveable. bcause not
+  // forbid cpy the return value to other thread, only moveable. because not
   // increase the counter if cpy.
 #if __cplusplus > 201703L
   [[nodiscard]]
