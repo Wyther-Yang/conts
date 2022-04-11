@@ -11,6 +11,9 @@
 #include "sync_queue.h"
 #include "sync_stack.h"
 #include "thread_pool.h"
+#include "rw_lock.h"
+#include "rw_seqlock.h"
+#include "rcu.h"
 
 namespace conts {
 
