@@ -43,7 +43,7 @@ class r_transfer
 
 public:
   r_transfer() = default;
-  // fixme: should use Rvalue cpystructor to impl
+  // fixme: should use Rvalue cpystructor to impl.
   r_transfer(r_transfer const&) = default;
   r_transfer& operator=(r_transfer&) = default;
   r_transfer& operator=(r_transfer&&) = default;
