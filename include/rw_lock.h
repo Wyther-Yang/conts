@@ -7,8 +7,6 @@ using std::atomic;
 
 namespace conts {
 
-// with 80x86 arch, opt in spin loop
-// inline void cpu_relax() { __asm__ __volatile__("rep;nop" : : : "memory"); }
 
 #define R_FREE  0x01000000U
 #define W_FREE  0x00000000U
