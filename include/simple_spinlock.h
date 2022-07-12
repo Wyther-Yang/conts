@@ -40,8 +40,8 @@ namespace std {
                 {
                         void* expect = nullptr;
                         while (!is_locked.compare_exchange_weak(expect, (void*)this, 
-                                                std::memory_order::relaxed,
-                                                std::memory_order::acquire))
+                                                std::memory_order::acquire,
+                                                std::memory_order::relaxed))
                         expect = nullptr;
                 }
 

@@ -54,8 +54,7 @@ inline int rw_sp_lock::r_lock()
 inline void rw_sp_lock::w_lock() 
 {
   uint32_t tmp = R_FREE;
-  while (!cnt.compare_exchange_strong(tmp, W_FREE, std::memory_order_acquire,
-                                     std::memory_order_relaxed))
+  while (!cnt.compare_exchange_weak(tmp, W_FREE, std::memory_order_relaxed))
   {
    // cpu_relax();
     tmp = R_FREE;
